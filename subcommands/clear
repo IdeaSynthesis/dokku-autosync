@@ -27,7 +27,7 @@ cmd-autosync-clear() {
     if [[ -f "$APP_PATH/autosync" ]]; then
         rm "$APP_PATH/autosync"
     fi    
-    cat "autosync configuration as been cleared"
+    echo "autosync configuration as been cleared"
 }
 
 cmd-autosync-clear "$@"
