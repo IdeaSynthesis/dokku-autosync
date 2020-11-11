@@ -12,7 +12,7 @@ cmd-autosync-default() {
     declare GITUSER="git"
     declare desc="Updates the app from a remote git repo"
     declare cmd="autosync"
-
+    
     # Support --app/$DOKKU_APP_NAME flag by reordering args into "$cmd $DOKKU_APP_NAME $@"                                                                                                                                                                                                                   
     local argv=("$@")
 
@@ -39,6 +39,11 @@ cmd-autosync-default() {
         dokku_log_warn "  please provide your default repository using"
         dokku_log_warn "  dokku config:set --no-restart $app DOKKU_AUTOSYNC_REPO=<repository name>"
         return 1
+    fi
+    
+    local user="$DOKKU_AUTOSYNC_USER"
+    if [[ "${user}" != "" ]]; then
+        GITUSER="${user}"
     fi
     
     DEFAULT_BRANCH="$(fn-plugin-property-get "git" "$APP" "deploy-branch" "master")"

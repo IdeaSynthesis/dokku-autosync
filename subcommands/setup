@@ -15,7 +15,8 @@ cmd-autosync-setup() {
     set -- $cmd $@
     ##
     declare APP="$2"
-
+    declare HOST="github.com"
+    
     [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
 
     eval "$(config_export global)"
@@ -31,6 +32,12 @@ cmd-autosync-setup() {
         return 1
     fi
 
+    # allow the hostname to be overridden
+    local host="$DOKKU_AUTOSYNC_HOST"
+    if [[ "${host}" != "" ]]; then
+        HOST="${host}"
+    fi
+    
     local APP_PATH=$DOKKU_ROOT/$APP
     if [[ -f "$APP_PATH/deploy.pub" ]]; then
         dokku_log_fail "There is already a deploy key, please clear the autosync plugin if you need to change your settings"
@@ -41,7 +48,7 @@ cmd-autosync-setup() {
     cat "$APP_PATH/deploy.pub"
 
     # create the ssh config file
-    echo -e "Host ${APP}\n\tHostname github.com\n\tIdentityFile ~/${APP}/deploy\n\tIdentitiesOnly yes" > "$APP_PATH/autosync"
+    echo -e "Host ${APP}\n\tHostname ${HOST}\n\tIdentityFile ~/${APP}/deploy\n\tIdentitiesOnly yes" > "$APP_PATH/autosync"
 }
 
 cmd-autosync-setup "$@"
