@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -eo pipefail
+[[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+
+cmd-autosync-default() {
+    declare desc="Updates the app from a remote git repo"
+    declare cmd="autosync"
+    [[ "$1" == "$cmd" ]] && shift 1
+    
+    declare APP="$1" GITUSER="git" REPO="${2}" TAGNAME="${3:-main}"
+
+    [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
+    verify_app_name "$APP"
+    
+    local APP_PATH=$DOKKU_ROOT/$APP
+
+    cd "$APP_PATH"
+    git fetch "$GITUSER@${APP}:${REPO}" "$TAGNAME"
+}
+
+cmd-autosync-default "$@"

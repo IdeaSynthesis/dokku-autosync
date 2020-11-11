@@ -1,0 +1,6 @@
+[plugin]
+name = "dokku-autosync"
+description = "Automatically syncs a Dokku app with a configured remote repository"
+version = "0.1.0"
+website_url = "https://github.com/IdeaSynthesis/dokku-autosync"
+[plugin.config]

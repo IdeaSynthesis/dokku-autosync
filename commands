@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+[[ " help autosync:help " == *" $1 "* ]] || exit "$DOKKU_NOT_IMPLEMENTED_EXIT"
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+case "$1" in
+
+  help | autosync:help)
+    help_content_func() {
+      #shellcheck disable=SC2034
+      declare desc="return autosync plugin help content"
+      cat<<help_content
+    autosync <app>, Update the app from the configured autosync repository
+    autosync:key <app>, Print out the autosync deploy key to be used with git
+    autosync:clear <app>, Remove the current autosync deploy key
+    autosync:setup <app>, Create a new autosync deploy key
+    autosync:help, Display autosync help
+help_content
+    }
+
+    if [[ $1 = "autosync:help" ]]; then
+      echo -e 'Usage: dokku autosync[:COMMAND]'
+      echo ''
+      echo 'Automatically synchronize the application git repository with a remote repository.'
+      echo ''
+      echo 'Additional commands:'
+      help_content_func | sort | column -c2 -t -s,
+    elif [[ $(ps -o command= $PPID) == *"--all"* ]]; then
+      help_content_func
+    else
+      cat<<help_desc
+    autosync, Plugin for automatically synchronizing the application git repository with a remote repository
+help_desc
+    fi
+    ;;
+
+  *)
+    exit "$DOKKU_NOT_IMPLEMENTED_EXIT"
+    ;;
+
+esac
+

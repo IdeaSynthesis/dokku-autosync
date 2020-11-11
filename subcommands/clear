@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -eo pipefail
+[[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+
+cmd-autosync-clear() {
+    declare desc="Clears the autosync deploy key for this app"
+    declare cmd="autosync"
+    [[ "$1" == "$cmd" ]] && shift 1
+    
+    declare APP="$1"
+
+    [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
+
+    local APP_PATH=$DOKKU_ROOT/$APP
+
+    if [[ -f "$APP_PATH/deploy" ]]; then
+        rm "$APP_PATH/deploy"
+    fi
+    if [[ -f "$APP_PATH/deploy.pub" ]]; then
+        rm "$APP_PATH/deploy.pub"
+    fi    
+    cat "autosync keys have been cleared"
+}
+
+cmd-autosync-clear "$@"

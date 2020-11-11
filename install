@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -eo pipefail
+[[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+
+plugin-install() {
+    # add the global include
+    if [[ "$(grep -F "Include ${DOKKU_ROOT}/*/autosync" "${DOKKU_ROOT}/.ssh/config")" == "" ]]; then
+        echo -e "\nInclude ${DOKKU_ROOT}/*/autosync" >> "${DOKKU_ROOT}/.ssh/config"
+    fi
+}
+
+plugin-install "$@"
