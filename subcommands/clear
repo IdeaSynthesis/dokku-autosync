@@ -6,9 +6,13 @@ source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 cmd-autosync-clear() {
     declare desc="Clears the autosync deploy key for this app"
     declare cmd="autosync"
-    [[ "$1" == "$cmd" ]] && shift 1
-    
-    declare APP="$1"
+    # Support --app/$DOKKU_APP_NAME flag by reordering args into "$cmd $DOKKU_APP_NAME $@"
+    local argv=("$@")
+    [[ ${argv[0]} == "$cmd" ]] && shift 1
+    [[ ! -z $DOKKU_APP_NAME ]] && set -- $DOKKU_APP_NAME $@
+    set -- $cmd $@
+    ##
+    declare APP="$2"
 
     [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
 
@@ -19,8 +23,11 @@ cmd-autosync-clear() {
     fi
     if [[ -f "$APP_PATH/deploy.pub" ]]; then
         rm "$APP_PATH/deploy.pub"
+    fi
+    if [[ -f "$APP_PATH/autosync" ]]; then
+        rm "$APP_PATH/autosync"
     fi    
-    cat "autosync keys have been cleared"
+    cat "autosync configuration as been cleared"
 }
 
 cmd-autosync-clear "$@"

@@ -6,9 +6,15 @@ source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 cmd-autosync-default() {
     declare desc="Updates the app from a remote git repo"
     declare cmd="autosync"
-    [[ "$1" == "$cmd" ]] && shift 1
-    
-    declare APP="$1" GITUSER="git" REPO="${2}" TAGNAME="${3:-main}"
+
+    # Support --app/$DOKKU_APP_NAME flag by reordering args into "$cmd $DOKKU_APP_NAME $@"
+    local argv=("$@")
+    [[ ${argv[0]} == "$cmd" ]] && shift 1
+    [[ ! -z $DOKKU_APP_NAME ]] && set -- $DOKKU_APP_NAME $@
+    set -- $cmd $@
+    ##
+    declare APP="$2"
+    declare GITUSER="git" REPO="${3}" TAGNAME="${4:-main}"
 
     [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
     verify_app_name "$APP"

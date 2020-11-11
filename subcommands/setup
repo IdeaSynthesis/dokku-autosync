@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash                                                                                                                                                                                                                                                                                          
 set -eo pipefail
 [[ $DOKKU_TRACE ]] && set -x
 source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
@@ -7,17 +7,22 @@ source "$PLUGIN_CORE_AVAILABLE_PATH/config/functions"
 cmd-autosync-setup() {
     declare desc="Creates the autosync deploy key for this app"
     declare cmd="autosync"
-    [[ "$1" == "$cmd" ]] && shift 1
-    
-    declare APP="$1"
+
+    # Support --app/$DOKKU_APP_NAME flag by reordering args into "$cmd $DOKKU_APP_NAME $@"
+    local argv=("$@")
+    [[ ${argv[0]} == "$cmd" ]] && shift 1
+    [[ ! -z $DOKKU_APP_NAME ]] && set -- $DOKKU_APP_NAME $@
+    set -- $cmd $@
+    ##
+    declare APP="$2"
 
     [[ -z "$APP" ]] && dokku_log_fail "Please specify an app to run the command on"
 
     eval "$(config_export global)"
     eval "$(config_export app "$APP")"
-    
+
     local email="$DOKKU_AUTOSYNC_EMAIL"
-    
+
     # check we have a valid e-mail address
     if [ -z "$email" ]; then
         dokku_log_warn "ERROR: Cannot configure autosync without an email address!"
@@ -25,16 +30,16 @@ cmd-autosync-setup() {
         dokku_log_warn "  dokku config:set --no-restart $app DOKKU_AUTOSYNC_EMAIL=<e-mail>"
         return 1
     fi
-    
+
     local APP_PATH=$DOKKU_ROOT/$APP
     if [[ -f "$APP_PATH/deploy.pub" ]]; then
         dokku_log_fail "There is already a deploy key, please setup the autosync plugin"
     fi
-    
+
     # create the key
-    ssh-keygen -t ed25519 -C <email address> -f "$APP_PATH/deploy"
+    ssh-keygen -t ed25519 -C "${email}" -f "$APP_PATH/deploy" -q -N ""
     cat "$APP_PATH/deploy.pub"
-    
+
     # create the ssh config file
     echo -e "Host ${APP}\n\tHostname github.com\n\tIdentityFile ~/${APP}/deploy\n\tIdentitiesOnly yes" > "$APP_PATH/autosync"
 }
