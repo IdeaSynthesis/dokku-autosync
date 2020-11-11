@@ -5,8 +5,12 @@ source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
 
 plugin-install() {
     # add the global include
+    if [[ ! -f "${DOKKU_ROOT}/.ssh/config" ]] ; then
+        echo -e "Include ${DOKKU_ROOT}/*/autosync\n" >> "${DOKKU_ROOT}/.ssh/config"
+        chown 644 "${DOKKU_ROOT}/.ssh/config"
+    fi
     if [[ "$(grep -F "Include ${DOKKU_ROOT}/*/autosync" "${DOKKU_ROOT}/.ssh/config")" == "" ]]; then
-        echo -e "\nInclude ${DOKKU_ROOT}/*/autosync" >> "${DOKKU_ROOT}/.ssh/config"
+        echo -e "\nInclude ${DOKKU_ROOT}/*/autosync\n" >> "${DOKKU_ROOT}/.ssh/config"
     fi
 }
 
