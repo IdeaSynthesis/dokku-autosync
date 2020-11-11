@@ -48,7 +48,7 @@ cmd-autosync-setup() {
     cat "$APP_PATH/deploy.pub"
 
     # create the ssh config file
-    echo -e "Host ${APP}\n\tHostname ${HOST}\n\tIdentityFile ~/${APP}/deploy\n\tIdentitiesOnly yes" > "$APP_PATH/autosync"
+    echo -e "Host ${APP}\n\tHostname ${HOST}\n\tIdentityFile ~/${APP}/deploy\n\tIdentitiesOnly yes\n" > "$APP_PATH/autosync"
 }
 
 cmd-autosync-setup "$@"
